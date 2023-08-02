@@ -60,11 +60,11 @@ postgresql = {
 
 ## Authors
 
-Module is maintained by [these awesome contributors](https://github.com/cloudnationhq/az-cn-module-tf-postgresql/graphs/contributors).
+Module is maintained by [these awesome contributors](https://github.com/cloudnationhq/az-cn-module-tf-pgsql/graphs/contributors).
 
 ## License
 
-MIT Licensed. See [LICENSE](https://github.com/cloudnationhq/az-cn-module-tf-postgresql/blob/main/LICENSE) for full details.
+MIT Licensed. See [LICENSE](https://github.com/cloudnationhq/az-cn-module-tf-pgsql/blob/main/LICENSE) for full details.
 
 ## Reference
 
