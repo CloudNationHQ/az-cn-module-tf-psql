@@ -1,5 +1,5 @@
 module "postgresql" {
-  source            = "../"
+  source            = "../../"
   environment       = var.environment
   workload          = var.workload
   subscription_id   = var.subscription_id
