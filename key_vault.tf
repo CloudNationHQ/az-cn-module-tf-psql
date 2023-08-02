@@ -15,6 +15,7 @@ resource "azurerm_key_vault" "key_vault" {
 
     key_permissions = [
       "Create",
+      "List",
       "Delete",
       "Get",
       "Purge",
@@ -61,7 +62,7 @@ resource "azurerm_key_vault" "key_vault" {
 }
 
 resource "azurerm_key_vault_key" "generated_key" {
-  name         = "generated-certificate"
+  name         = "pgsql-generated-key"
   key_vault_id = azurerm_key_vault.key_vault.id
   key_type     = "RSA"
   key_size     = 2048
