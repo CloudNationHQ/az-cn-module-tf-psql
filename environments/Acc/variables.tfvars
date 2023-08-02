@@ -29,4 +29,42 @@ postgresql = {
     # geo_backup_key_vault_key_id             = 
     geo_backup_user_assigned_identity_id    = "/subscriptions/XXX/resourceGroups/test-deployment/providers/Microsoft.ManagedIdentity/userAssignedIdentities/pgsql-test-acc-second-uai"
   }
+
+  databases =[
+    {
+        name = "database1"
+        collation = "en_GB.UTF8"
+        charset = "SQL_ASCII"
+    },
+    {
+        name = "database2"
+        collation = "fi_FI.UTF8"
+    },
+    {
+        name = "database3"
+        charset = "UTF8"
+    },
+    {
+        name = "database4"
+    }
+  ]
+   dns_zone_name = "test.com"
+
+   firewall_rules =[
+    {
+        name = "rule1"
+        start_ip_address = "149.177.166.251"
+        end_ip_address  = "149.177.166.251"
+    },
+    {
+        name = "rule2"
+        start_ip_address = "144.177.166.251"
+        end_ip_address  = "144.177.166.251"
+    },
+    {
+        name = "AllowAzureServices"
+        start_ip_address = "0.0.0.0"
+        end_ip_address  = "0.0.0.0"
+    },
+  ]
 }
