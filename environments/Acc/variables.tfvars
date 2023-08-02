@@ -14,7 +14,7 @@ postgresql = {
   
   backup_retention_days = 7
   geo_redundant_backup_enabled = false
-  
+  dns_zone_name_subdomain_prefix = "test"
   identity = {
       user_assigned_identity = true 
       other_identity_ids          = ["/subscriptions/XXX/resourceGroups/test-deployment/providers/Microsoft.ManagedIdentity/userAssignedIdentities/pgsql-test-acc-second-uai"]
@@ -48,7 +48,6 @@ postgresql = {
         name = "database4"
     }
   ]
-   dns_zone_name = "test.com"
 
    firewall_rules =[
     {
@@ -67,4 +66,10 @@ postgresql = {
         end_ip_address  = "0.0.0.0"
     },
   ]
+  network = {
+    subnet_name             = "snet-reg-sandbox-weu-001"
+    vnet_name               = "vnet-reg-sandbox-weu-001"
+    subnet_address          = "10.0.9.0/29"
+    subnet_resource_group   = "rg-reg-sandbox-weu-001"
+  }
 }
