@@ -17,7 +17,7 @@ postgresql = {
   dns_zone_name_subdomain_prefix = "test"
   identity = {
       user_assigned_identity = true 
-      other_identity_ids          = ["/subscriptions/XXX/resourceGroups/test-deployment/providers/Microsoft.ManagedIdentity/userAssignedIdentities/pgsql-test-acc-second-uai"]
+      other_identity_ids          = ["/subscriptions/XXX/resourceGroups/rg-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/pgsql-test-acc-second-uai"]
   }
 
   auth = {
@@ -25,9 +25,8 @@ postgresql = {
     pw_auth_enabled               = true
   }
 
-  cmk = {
-    # geo_backup_key_vault_key_id             = 
-    geo_backup_user_assigned_identity_id    = "/subscriptions/XXX/resourceGroups/test-deployment/providers/Microsoft.ManagedIdentity/userAssignedIdentities/pgsql-test-acc-second-uai"
+  cmk = { 
+    geo_backup_user_assigned_identity_id    = "/subscriptions/XXX/resourceGroups/rg-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/pgsql-test-acc-second-uai"
   }
 
   databases =[
