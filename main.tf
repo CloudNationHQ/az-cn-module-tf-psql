@@ -92,7 +92,7 @@ resource "azurerm_user_assigned_identity" "primary_identity" {
   for_each =  var.postgresql.identity.user_assigned_identity == true ? { "identity" = {} } : {}
 
   location            = var.postgresql.location
-  name                = "pgsql-${var.workload}-${var.environment}-uai"
+  name                = "uai-pgsql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
   resource_group_name = var.postgresql.resource_group
 }
 
@@ -101,18 +101,13 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "po
   resource_group_name = var.postgresql.resource_group
   tenant_id           = data.azurerm_client_config.current.tenant_id
   object_id           = try(var.postgresql.auth.object_id, data.azurerm_client_config.current.object_id)
-#   principal_type      = "ServicePrincipal"
-  principal_type = "User" # for local testing
+  principal_type      = "ServicePrincipal"
   principal_name      = try(var.postgresql.auth.principal_name, data.azuread_user.current.display_name)
 }
 
-data "azuread_user" "current" {  # for local testing
+data "azuread_service_principal" "current" {
   object_id = data.azurerm_client_config.current.object_id
 }
-
-# data "azuread_service_principal" "current" {
-#   object_id = data.azurerm_client_config.current.object_id
-# }
 
 resource "azurerm_postgresql_flexible_server_database" "database" {
   for_each = try({for database in var.postgresql.databases: database.name => database}, {})
