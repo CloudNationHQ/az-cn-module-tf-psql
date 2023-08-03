@@ -27,12 +27,9 @@ provider "azurerm" {
       purge_soft_deleted_secrets_on_destroy = false
     }
   }
-  subscription_id            = var.subscription_id
-  tenant_id = var.tenant_id
 }
 
 provider "azuread" {
-  tenant_id = var.tenant_id
 }
 
 data "azurerm_client_config" "current" {
