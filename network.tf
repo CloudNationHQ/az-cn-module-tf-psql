@@ -11,7 +11,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "postgresql" {
 
 resource "azurerm_private_dns_zone" "postgresql" {
   for_each = try(var.postgresql.dns_zone_name, null) !=  null ? {"dns" = {}} : {}
-  name                = "${var.postgresql.dns_zone_name_subdomain_prefix}.postgres.database.azure.com"
+  name                = "${var.postgresql.dns_zone_subdomain_prefix}.postgres.database.azure.com"
   resource_group_name = var.postgresql.resource_group
 }
 
