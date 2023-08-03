@@ -7,7 +7,7 @@ resource "random_password" "pgsql_admin_password" {
 }
 
 resource "azurerm_postgresql_flexible_server" "postgresql" {
-  name                = "pgsql-${var.workload}-${var.environment}-server"
+  name                = "pgsql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
   location            = var.postgresql.location
   resource_group_name = var.postgresql.resource_group
   
