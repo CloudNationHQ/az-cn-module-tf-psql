@@ -1,5 +1,5 @@
 resource "azurerm_key_vault" "key_vault" {
-  name                        = "pgsql-${var.workload}-${var.environment}-kv"
+  name                        = "kv-pgsql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
   location                    = var.postgresql.location
   resource_group_name         = var.postgresql.resource_group
   enabled_for_disk_encryption = true
