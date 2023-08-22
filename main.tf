@@ -7,7 +7,7 @@ resource "random_password" "psql_admin_password" {
 }
 
 resource "azurerm_postgresql_flexible_server" "postgresql" {
-  name                = "psql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
+  name                = var.postgresql.name
   location            = var.postgresql.location
   resource_group_name = var.postgresql.resource_group
   
@@ -22,14 +22,14 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
 
   create_mode                  = try(var.postgresql.create_mode, "Default")
   administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" ? "psql_${var.workload}_${var.environment}_admin" : null
-  administrator_password       = random_password.psql_admin_password.result
+  administrator_password       = try(var.postgresql.admin_password, random_password.psql_admin_password.result)
 
 
   point_in_time_restore_time_in_utc = try(var.postgresql.create_mode, null) == "PointInTimeRestore" ? var.postgresql.restore_time_utc : null
   replication_role = try(var.postgresql.create_mode, null) == "Replica" ? "None" : null
   source_server_id = try(var.postgresql.create_mode, null) == "PointInTimeRestore" || try(var.postgresql.create_mode, null) == "Replica" ? var.postgresql.source_server_id : null
-  delegated_subnet_id =  try(azurerm_subnet.postgresql["subnet"].id, null)
-  private_dns_zone_id =  try(azurerm_private_dns_zone.postgresql["dns"].id, null)
+  delegated_subnet_id =  try(var.postgresql.network.subnet_id, null)
+  private_dns_zone_id =  try(var.postgresql.network.private_dns_zone_id, null)
  
     dynamic "identity"{
     for_each = try(var.postgresql.identity.user_assigned_identity, null) == true ? [1]: []
@@ -44,10 +44,10 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
     for_each = try(var.postgresql.cmk, null) != null ? var.postgresql.cmk : {}
 
     content {
-    key_vault_key_id                     = try(azurerm_key_vault_key.generated_key.id, null)
+    key_vault_key_id                     = try(var.postgresql.cmk.key_id, null)
     primary_user_assigned_identity_id    = azurerm_user_assigned_identity.primary_identity["identity"].id
-    geo_backup_key_vault_key_id          = try(customer_managed_key.geo_backup_key_vault_key_id, null)
-    geo_backup_user_assigned_identity_id = try(customer_managed_key.geo_backup_user_assigned_identity_id, null)
+    geo_backup_key_vault_key_id          = try(var.postgresql.cmk.geo_backup_key_vault_key_id, null)
+    geo_backup_user_assigned_identity_id = try(var.postgresql.cmk.geo_backup_user_assigned_identity_id, null)
     }
   }
 
@@ -102,7 +102,7 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "po
   tenant_id           = data.azurerm_client_config.current.tenant_id
   object_id           = try(var.postgresql.auth.object_id, data.azurerm_client_config.current.object_id)
   principal_type      = "ServicePrincipal"
-  principal_name      = try(var.postgresql.auth.principal_name, data.azuread_user.current.display_name)
+  principal_name      = try(var.postgresql.auth.principal_name, data.azuread_service_principal.current.display_name)
 }
 
 data "azuread_service_principal" "current" {

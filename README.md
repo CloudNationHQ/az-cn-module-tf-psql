@@ -20,7 +20,7 @@ The below examples shows the usage when consuming the module:
 
 ```hcl
 module "postgresql" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-postgresql"
+  source = "github.com/cloudnationhq/az-cn-module-tf-psql"
 
   environment       = var.environment
   workload          = var.workload
