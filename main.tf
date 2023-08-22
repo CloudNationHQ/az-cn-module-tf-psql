@@ -21,7 +21,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
 
 
   create_mode                  = try(var.postgresql.create_mode, "Default")
-  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" ? "psql_${var.workload}_${var.environment}_admin" : null
+  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" ? "${var.postgresql.name}_admin" : null
   administrator_password       = try(var.postgresql.admin_password, random_password.psql_admin_password.result)
 
 
@@ -92,7 +92,7 @@ resource "azurerm_user_assigned_identity" "primary_identity" {
   for_each =  var.postgresql.identity.user_assigned_identity == true ? { "identity" = {} } : {}
 
   location            = var.postgresql.location
-  name                = "uai-psql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
+  name                = "uai-${var.postgresql.name}"
   resource_group_name = var.postgresql.resource_group
 }
 
