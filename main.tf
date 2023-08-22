@@ -1,4 +1,4 @@
-resource "random_password" "pgsql_admin_password" {
+resource "random_password" "psql_admin_password" {
   length           = 16
   min_lower        = 1
   min_upper        = 1
@@ -7,7 +7,7 @@ resource "random_password" "pgsql_admin_password" {
 }
 
 resource "azurerm_postgresql_flexible_server" "postgresql" {
-  name                = "pgsql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
+  name                = "psql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
   location            = var.postgresql.location
   resource_group_name = var.postgresql.resource_group
   
@@ -21,8 +21,8 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
 
 
   create_mode                  = try(var.postgresql.create_mode, "Default")
-  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" ? "pgsql_${var.workload}_${var.environment}_admin" : null
-  administrator_password       = random_password.pgsql_admin_password.result
+  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" ? "psql_${var.workload}_${var.environment}_admin" : null
+  administrator_password       = random_password.psql_admin_password.result
 
 
   point_in_time_restore_time_in_utc = try(var.postgresql.create_mode, null) == "PointInTimeRestore" ? var.postgresql.restore_time_utc : null
@@ -92,7 +92,7 @@ resource "azurerm_user_assigned_identity" "primary_identity" {
   for_each =  var.postgresql.identity.user_assigned_identity == true ? { "identity" = {} } : {}
 
   location            = var.postgresql.location
-  name                = "uai-pgsql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
+  name                = "uai-psql-${var.workload}-${var.environment}-${var.region}-${var.instance}"
   resource_group_name = var.postgresql.resource_group
 }
 
