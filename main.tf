@@ -89,7 +89,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
 }
 
 resource "azurerm_user_assigned_identity" "primary_identity" {
-  for_each =  var.postgresql.identity.user_assigned_identity == true ? { "identity" = {} } : {}
+  for_each =  try(var.postgresql.identity.user_assigned_identity, null) == true ? { "identity" = {} } : {}
 
   location            = var.postgresql.location
   name                = "uai-${var.postgresql.name}"
