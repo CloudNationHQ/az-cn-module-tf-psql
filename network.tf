@@ -16,7 +16,7 @@ resource "azurerm_private_dns_zone" "postgresql" {
 }
 
 resource "azurerm_subnet" "postgresql" {
-  for_each = try(var.postgresql.network, null) != null  ? {"subnet" = {}} : {}
+  for_each = try(var.postgresql.network.subnet_name, null) != null  ? {"subnet" = {}} : {}
 
   name                 = var.postgresql.network.subnet_name
   resource_group_name  = var.postgresql.network.subnet_resource_group
@@ -34,14 +34,14 @@ resource "azurerm_subnet" "postgresql" {
 }
 
 data "azurerm_virtual_network" "vnet" {
-  for_each = try(var.postgresql.network, null) != null  ? {"vnet" = {}} : {}
+  for_each = try(var.postgresql.network.vnet_name, null) != null  ? {"vnet" = {}} : {}
 
   name                = var.postgresql.network.vnet_name
   resource_group_name = var.postgresql.network.subnet_resource_group
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
-  for_each = try(var.postgresql.network, null) != null  ? {"dns_link" = {}} : {}
+  for_each = try(var.postgresql.network.vnet_name, null) != null  ? {"dns_link" = {}} : {}
 
   name                  = "postgresql-link"
   resource_group_name   = var.postgresql.resource_group
