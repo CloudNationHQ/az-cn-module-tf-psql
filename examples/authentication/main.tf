@@ -59,6 +59,9 @@ module "postgresql" {
     auth = {
         ad_auth_enabled = true
         pw_auth_enabled = true
+
+        object_id       = "XXXXXXXX-YYYY-ZZZZ-AAAA-1234567890"
+        principal_name  = 'service-principal'
       }
   }
 }

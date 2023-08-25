@@ -17,8 +17,7 @@ A primary goal is to utilize keys and values in the object that correspond to th
 
 - Options for Azure AD administrator authentication, local administrator authentication or both.
 - Support for customer managed keys with an user assigned identity. 
-- Enable VNET integration by setting a delegation for a subnet and private dns link.
-- Create your own subnet and private dns zone or provide existing as input. 
+- Enable VNET integration by setting a delegation for a subnet and private dns zone link.
 - Support for maintenance window, high availability and restore options. 
 - Option for creating (empty) postgresql databases. 
 
@@ -128,6 +127,8 @@ module "postgresql" {
       auth = {
         ad_auth_enabled = true
         pw_auth_enabled = true
+        object_id       = "XXXXXXXX-YYYY-ZZZZ-AAAA-1234567890"
+        principal_name  = "service-principal-name"
       }
   }
 }
@@ -148,7 +149,6 @@ module "postgresql" {
   
       network = {
         delegated_subnet_id   = module.network["module.naming.virtual_network.name"].subnets["postgresql"].id
-        private_dns_zone_name = data.azurerm_private_dns_zone.postgresql.name
         private_dns_zone_id   = data.azurerm_private_dns_zone.postgresql.id
     }
   }
