@@ -159,31 +159,7 @@ data "azurerm_private_dns_zone" "postgresql" {
   provider = azurerm.connectivity  ## Private link used in CAF module
 }
 
-```
-
-## Usage: Subnet delegation creating your own DNS zone and subnet
-
-```hcl
-module "postgresql" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-psql"
-
-  postgresql  = {
-
-      location        = module.rg.groups.test.name
-      resource_group  = module.rg.groups.test.name
-      sku_name        = "B_Standard_B2s"
-      server_version  = 15
-  
-      network = {
-        subnet_name               = "snet-psql"
-        subnet_address            = "10.0.0.0/23"
-        vnet_name                 = "vnet-spoke-main"  #existing vnet
-        vnet_resource_group       = "rg-network"
-        dns_zone_subdomain_prefix = "privatelink"
-    }
-  }
-}
-```
+``` 
 
 ## Usage: High availability
 
