@@ -11,7 +11,6 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
   location            = var.postgresql.location
   resource_group_name = var.postgresql.resource_group
   
-
   version                      = try(var.postgresql.server_version, 15)
   sku_name                     = try(var.postgresql.sku_name, "B_Standard_B1ms")
   storage_mb                   = try(var.postgresql.storage_mb, 32768)
@@ -19,23 +18,22 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
   geo_redundant_backup_enabled = try(var.postgresql.geo_redundant_backup_enabled, false)
   zone                         = try(var.postgresql.zone, null)
 
-
   create_mode                  = try(var.postgresql.create_mode, "Default")
-  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" ? "${var.postgresql.name}_admin" : null
-  administrator_password       = try(var.postgresql.admin_password, random_password.psql_admin_password.result)
+  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" || try(var.postgresql.auth.pw_auth_enabled, null) == true ? "${var.postgresql.name}_admin" : null
+  administrator_password       = try(var.postgresql.create_mode, "Default") == "Default" || try(var.postgresql.auth.pw_auth_enabled, null) == true ? "try(var.postgresql.admin_password, random_password.psql_admin_password.result)" : null
 
-
-  point_in_time_restore_time_in_utc = try(var.postgresql.create_mode, null) == "PointInTimeRestore" ? var.postgresql.restore_time_utc : null
-  replication_role = try(var.postgresql.create_mode, null) == "Replica" ? "None" : null
-  source_server_id = try(var.postgresql.create_mode, null) == "PointInTimeRestore" || try(var.postgresql.create_mode, null) == "Replica" ? var.postgresql.source_server_id : null
-  delegated_subnet_id =  try(var.postgresql.network.subnet_id, null)
-  private_dns_zone_id =  try(var.postgresql.network.private_dns_zone_id, null)
+  delegated_subnet_id          =  try(var.postgresql.network.subnet_id, null)
+  private_dns_zone_id          =  try(var.postgresql.network.private_dns_zone_id, null)
+  
+  source_server_id                   = try(var.postgresql.create_mode, null) == "PointInTimeRestore" || try(var.postgresql.create_mode, null) == "Replica" ? var.postgresql.source_server_id : null
+  point_in_time_restore_time_in_utc  = try(var.postgresql.create_mode, null) == "PointInTimeRestore" ? var.postgresql.restore_time_utc : null
+  replication_role                   = try(var.postgresql.create_mode, null) == "Replica" ? "None" : null
  
     dynamic "identity"{
     for_each = try(var.postgresql.identity.user_assigned_identity, null) == true ? [1]: []
 
     content {
-    type = try(var.postgresql.identity.user_assigned_identity, null) == true ? "UserAssigned" : null
+    type         = try(var.postgresql.identity.user_assigned_identity, null) == true ? "UserAssigned" : null
     identity_ids = concat([azurerm_user_assigned_identity.primary_identity["identity"].id], try(var.postgresql.identity.other_identity_ids, []))
     }
   }
@@ -65,7 +63,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
     for_each = try(var.postgresql.high_availability, null) != null ? [1] : []
 
     content {
-    mode   = try(var.postgresql.high_availability.mode, "SameZone")
+    mode                      = try(var.postgresql.high_availability.mode, "SameZone")
     standby_availability_zone = try(var.postgresql.high_availability.standby_availability_zone, null)
     }
   }
@@ -97,6 +95,8 @@ resource "azurerm_user_assigned_identity" "primary_identity" {
 }
 
 resource "azurerm_postgresql_flexible_server_active_directory_administrator" "postgresql" {
+  for_each =  try(var.postgresql.auth.ad_auth_enabled, null) == true ? { "ad_auth" = {} } : {}
+
   server_name         = azurerm_postgresql_flexible_server.postgresql.name
   resource_group_name = var.postgresql.resource_group
   tenant_id           = data.azurerm_client_config.current.tenant_id
