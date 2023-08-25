@@ -42,7 +42,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
     for_each = try(var.postgresql.cmk, null) != null ? var.postgresql.cmk : {}
 
     content {
-    key_vault_key_id                     = try(var.postgresql.cmk.key_id, null)
+    key_vault_key_id                     = try(var.postgresql.cmk.key_vault_key_id, null)
     primary_user_assigned_identity_id    = azurerm_user_assigned_identity.primary_identity["identity"].id
     geo_backup_key_vault_key_id          = try(var.postgresql.cmk.geo_backup_key_vault_key_id, null)
     geo_backup_user_assigned_identity_id = try(var.postgresql.cmk.geo_backup_user_assigned_identity_id, null)
