@@ -19,7 +19,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
   zone                         = try(var.postgresql.zone, null)
 
   create_mode                  = try(var.postgresql.create_mode, "Default")
-  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" || try(var.postgresql.auth.pw_auth_enabled, null) == true ? "${replace(var.postgresql.name}, "-", "_")_admin" : null
+  administrator_login          = try(var.postgresql.create_mode, "Default") == "Default" || try(var.postgresql.auth.pw_auth_enabled, null) == true ? "${replace(var.postgresql.name, "-", "_")}_admin" : null
   administrator_password       = try(var.postgresql.create_mode, "Default") == "Default" || try(var.postgresql.auth.pw_auth_enabled, null) == true ? "try(var.postgresql.admin_password, random_password.psql_admin_password.result)" : null
 
   delegated_subnet_id          =  try(var.postgresql.network.subnet_id, null)
