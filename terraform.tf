@@ -5,17 +5,13 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.70"
     }
-    postgresql = {
-      source  = "cyrilgdn/postgresql"
-      version = "~> 1.20.0"
-    }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.5.1"
+      version = "~> 3.5"
     }
     azuread = {
       source = "hashicorp/azuread"
-      version = "~> 2.41.0"
+      version = "~> 2.41"
     }
   }
 }
