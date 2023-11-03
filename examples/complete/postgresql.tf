@@ -43,7 +43,7 @@ postgresql_servers = [
             name = "rule1"
             start_ip_address = "111.222.333.444"
             end_ip_address  = "111.222.333.444"
-        }
+        },
         {
             name = "AllowAzureServices"
             start_ip_address = "0.0.0.0"
