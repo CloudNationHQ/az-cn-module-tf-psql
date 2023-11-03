@@ -43,7 +43,7 @@ module "network" {
       postgresql = { 
         cidr = ["10.18.1.0/27"] 
         delegations = {
-          psql-delegation {
+          psql-delegation = {
             name    = "Microsoft.DBforPostgreSQL/flexibleServers"
             actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
           }
