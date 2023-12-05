@@ -69,7 +69,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql" {
   }
 
   dynamic "maintenance_window" {
-    for_each = try(var.postgresql.maintenance_window, null) != null ? var.postgresql.maintenance_window : []
+    for_each = try(var.postgresql.maintenance_window, null) != null ? [1] : []
 
     content {
       day_of_week  = try(var.postgresql.maintenance_window.day_of_week, null)
@@ -110,7 +110,7 @@ data "azuread_service_principal" "current" {
 }
 
 resource "azurerm_postgresql_flexible_server_database" "database" {
-  for_each = try({ for database in local.postgresql.databases : database.db_key => database }, {})
+  for_each = try({ for database in local.databases : database.db_key => database }, {})
 
   name      = each.value.name
   server_id = azurerm_postgresql_flexible_server.postgresql.id
