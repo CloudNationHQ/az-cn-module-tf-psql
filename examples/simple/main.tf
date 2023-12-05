@@ -1,7 +1,3 @@
-provider "azurerm" {
-  features {}
-}
-
 module "naming" {
   source  = "cloudnationhq/naming/azure"
   version = "~> 0.1"
@@ -22,11 +18,11 @@ module "rg" {
 }
 
 module "postgresql" {
-  source  = "cloudnationhq/psql/azure"
-  version = "~> 0.1"
+  source = "github.com/CloudNationHQ/az-cn-module-tf-psql"
+  # version = "~> 0.1"
 
   postgresql = {
-    name           = module.naming.postgresql.name
+    name           = module.naming.postgresql_server.name
     location       = module.rg.groups.demo.location
     resource_group = module.rg.groups.demo.name
 
