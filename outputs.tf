@@ -1,11 +1,14 @@
 output "postgresql_server" {
-  value = azurerm_postgresql_flexible_server.postgresql
+  description = "contains the postgresql server config"
+  value       = azurerm_postgresql_flexible_server.postgresql
 }
 
 output "admin_password" {
-  value = random_password.psql_admin_password.result
+  description = "contains the admin password generated for the postgresql server if not provided"
+  value       = random_password.psql_admin_password.result
 }
 
 output "databases" {
-  value = azurerm_postgresql_flexible_server_database.database
+  description = "contains the databases created on the postgresql server"
+  value       = azurerm_postgresql_flexible_server_database.database
 }
