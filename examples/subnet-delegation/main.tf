@@ -1,20 +1,13 @@
-provider "azurerm" {
-  features {}
-}
-
-provider "azurerm" {
-  alias  = "connectivity"
-  features {}
-}
-
 module "naming" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-naming"
+  source  = "cloudnationhq/naming/azure"
+  version = "~> 0.1"
 
   suffix = ["demo", "dev"]
 }
 
 module "rg" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-rg"
+  source  = "cloudnationhq/rg/azure"
+  version = "~> 0.1"
 
   groups = {
     demo = {
@@ -25,7 +18,8 @@ module "rg" {
 }
 
 module "network" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-vnet"
+  source  = "cloudnationhq/vnet/azure"
+  version = "~> 0.1"
 
   naming = {
     subnet                 = module.naming.subnet.name
@@ -40,8 +34,8 @@ module "network" {
     cidr          = ["10.18.0.0/16"]
 
     subnets = {
-      postgresql = { 
-        cidr = ["10.18.1.0/27"] 
+      postgresql = {
+        cidr = ["10.18.1.0/27"]
         delegations = {
           psql-delegation = {
             name    = "Microsoft.DBforPostgreSQL/flexibleServers"
@@ -54,25 +48,36 @@ module "network" {
 }
 
 module "postgresql" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-psql"
-  
-  postgresql  = {
-    name            = module.naming.postgresql.name_unique
-    location        = module.rg.groups.demo.location
-    resource_group  = module.rg.groups.demo.name
+  source  = "cloudnationhq/psql/azure"
+  version = "~> 0.1"
 
-    create_mode     = "Default"
-    sku_name        = "GP_Standard_D2s_v3"
-    server_version  = 15
+  postgresql = {
+    name           = module.naming.postgresql.name_unique
+    location       = module.rg.groups.demo.location
+    resource_group = module.rg.groups.demo.name
+
+    create_mode    = "Default"
+    sku_name       = "GP_Standard_D2s_v3"
+    server_version = 15
 
     network = {
-    delegated_subnet_id   = module.network.subnets["postgresql"].id
-    private_dns_zone_id   = data.azurerm_private_dns_zone.postgresql.id
+      delegated_subnet_id = module.network.subnets.postgresql.id
+      private_dns_zone_id = module.private_dns.zone.id
     }
   }
 }
 
-data "azurerm_private_dns_zone" "postgresql" {
-  name     = "privatelink.postgres.database.azure.com"
-  provider = azurerm.connectivity  ## Private link as used in CAF module
+module "private_dns" {
+  source  = "cloudnationhq/sa/azure//modules/private-dns"
+  version = "~> 0.1"
+
+  providers = {
+    azurerm = azurerm.connectivity
+  }
+
+  zone = {
+    name          = "privatelink.postgres.database.azure.com"
+    resourcegroup = "rg-dns-shared-001"
+    vnet          = module.network.vnet.id
+  }
 }
