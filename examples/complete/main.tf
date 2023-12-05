@@ -1,11 +1,13 @@
 module "naming" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-naming"
+  source  = "cloudnationhq/naming/azure"
+  version = "~> 0.1"
 
-  suffix = ["${var.environment}", "${var.workload}"]
+  suffix = ["prod", "demo"]
 }
 
 module "rg" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-rg"
+  source  = "cloudnationhq/rg/azure"
+  version = "~> 0.1"
 
   groups = {
     demo = {
@@ -16,20 +18,22 @@ module "rg" {
 }
 
 module "kv" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-kv"
+  source  = "cloudnationhq/kv/azure"
+  version = "~> 0.2"
 
   for_each = {
-    for kv in local.key_vaults : kv.name => kv
+    for key, kv in local.key_vaults : key => kv
   }
 
   naming = local.naming
-  
+
   vault = each.value
- 
+
 }
 
 module "network" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-vnet"
+  source  = "cloudnationhq/vnet/azure"
+  version = "~> 0.1"
 
   naming = {
     subnet                 = module.naming.subnet.name
@@ -41,20 +45,31 @@ module "network" {
 }
 
 module "postgresql" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-psql"
-  
+  source  = "cloudnationhq/psql/azure"
+  version = "~> 0.1"
+
   for_each = {
-    for pg in local.postgresql_servers : pg.name => pg
+    for key, psql in local.postgresql_servers : key => psql
   }
   postgresql = each.value
+}
+
+module "private_dns" {
+  source  = "cloudnationhq/sa/azure//modules/private-dns"
+  version = "~> 0.1"
+
+  providers = {
+    azurerm = azurerm.connectivity
+  }
+
+  zone = {
+    name          = "privatelink.postgres.database.azure.com"
+    resourcegroup = "rg-dns-shared-001"
+    vnet          = module.network.vnet.id
+  }
 }
 
 data "azurerm_user_assigned_identity" "backup_user" {
   name                = "name-uai"
   resource_group_name = "rg-test"
-}
-
-data "azurerm_private_dns_zone" "postgresql" {
-  name     = "privatelink.postgres.database.azure.com"
-  provider = azurerm.connectivity  ## Private link as used in CAF module
 }
