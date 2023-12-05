@@ -4,8 +4,8 @@ locals {
 
       db_key    = db_key
       name      = "${var.naming.postgresql_database}-${db_key}"
-      charset   = try(each.value.charset, null)
-      collation = try(each.value.collation, null)
+      charset   = try(db.charset, null)
+      collation = try(db.collation, null)
     }
   ])
 }
