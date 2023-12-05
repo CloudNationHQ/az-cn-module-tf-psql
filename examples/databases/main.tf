@@ -1,15 +1,13 @@
-provider "azurerm" {
-  features {}
-}
-
 module "naming" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-naming"
+  source  = "cloudnationhq/naming/azure"
+  version = "~> 0.1"
 
   suffix = ["demo", "dev"]
 }
 
 module "rg" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-rg"
+  source  = "cloudnationhq/rg/azure"
+  version = "~> 0.1"
 
   groups = {
     demo = {
@@ -20,23 +18,24 @@ module "rg" {
 }
 
 module "postgresql" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-psql"
+  source  = "cloudnationhq/psql/azure"
+  version = "~> 0.1"
 
-  postgresql  = {
+  postgresql = {
 
-      location        = module.rg.groups.demo.location
-      resource_group  = module.rg.groups.demo.name
-      sku_name        = "B_Standard_B2s"
-      server_version  = 15
-  
-      databases = [
-        {
+    location       = module.rg.groups.demo.location
+    resource_group = module.rg.groups.demo.name
+    sku_name       = "B_Standard_B2s"
+    server_version = 15
+
+    databases = [
+      {
         name    = "database1"
         charset = "UTF8"
-        },
-        {
+      },
+      {
         name = "database2"
-        }
-      ]
+      }
+    ]
   }
 }
