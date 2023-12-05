@@ -1,4 +1,4 @@
-locals = {
+locals {
   key_vaults = {
     main = {
       name          = "${module.naming.key_vault.name}-main"

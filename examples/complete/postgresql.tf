@@ -19,13 +19,13 @@ locals {
 
       identity = {
         user_assigned_identity = true
-        other_identity_ids     = [data.azurerm_user_assigned_identity.backup_user.id]
+        other_identity_ids     = [azurerm_user_assigned_identity.backup_user.id]
       }
 
       cmk = {
         key_vault_key_id                     = module.kv["main"].kv_keys.psql.id
         geo_backup_key_vault_key_id          = module.kv["backup"].kv_keys.psql.id
-        geo_backup_user_assigned_identity_id = data.azurerm_user_assigned_identity.backup_user.id
+        geo_backup_user_assigned_identity_id = azurerm_user_assigned_identity.backup_user.id
       }
 
       databases = {

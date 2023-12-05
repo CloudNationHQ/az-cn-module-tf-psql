@@ -90,7 +90,7 @@ resource "azurerm_user_assigned_identity" "primary_identity" {
   for_each = try(var.postgresql.identity.user_assigned_identity, null) == true ? { "identity" = {} } : {}
 
   location            = var.postgresql.location
-  name                = "uai-${var.postgresql.name}"
+  name                = "${var.naming.user_assigned_identity}-${var.postgresql.name}"
   resource_group_name = var.postgresql.resource_group
 }
 

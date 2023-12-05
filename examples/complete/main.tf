@@ -35,18 +35,33 @@ module "network" {
   source  = "cloudnationhq/vnet/azure"
   version = "~> 0.1"
 
-  naming = {
-    subnet                 = module.naming.subnet.name
-    network_security_group = module.naming.network_security_group.name
-    route_table            = module.naming.route_table.name
-  }
+  naming = local.naming
 
-  vnet = local.vnet
+  vnet = {
+    name          = module.naming.virtual_network.name
+    location      = module.rg.groups.demo.location
+    resourcegroup = module.rg.groups.demo.name
+    cidr          = ["10.18.0.0/16"]
+
+    subnets = {
+      postgresql = {
+        cidr = ["10.18.1.0/27"]
+        delegations = {
+          psql-delegation = {
+            name    = "Microsoft.DBforPostgreSQL/flexibleServers"
+            actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+          }
+        }
+      }
+    }
+  }
 }
 
 module "postgresql" {
   source  = "cloudnationhq/psql/azure"
   version = "~> 0.1"
+
+  naming = local.naming
 
   for_each = {
     for key, psql in local.postgresql_servers : key => psql
@@ -69,7 +84,9 @@ module "private_dns" {
   }
 }
 
-data "azurerm_user_assigned_identity" "backup_user" {
-  name                = "name-uai"
-  resource_group_name = "rg-test"
+resource "azurerm_user_assigned_identity" "backup_user" {
+
+  name                = local.naming.user_assigned_identity.name
+  resource_group_name = module.rg.groups.demo.name
+  location            = module.rg.groups.demo.location
 }
