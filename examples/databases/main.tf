@@ -28,14 +28,12 @@ module "postgresql" {
     sku_name       = "B_Standard_B2s"
     server_version = 15
 
-    databases = [
-      {
-        name    = "database1"
+    databases = {
+      database1 = {
         charset = "UTF8"
-      },
-      {
-        name = "database2"
       }
-    ]
+      database2 = {
+      }
+    }
   }
 }

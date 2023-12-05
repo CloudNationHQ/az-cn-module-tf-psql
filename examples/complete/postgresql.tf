@@ -28,28 +28,24 @@ locals {
         geo_backup_user_assigned_identity_id = data.azurerm_user_assigned_identity.backup_user.id
       }
 
-      databases = [
-        {
-          name    = "postgres"
+      databases = {
+        postgresdb1 = {
           charset = "UTF8"
-        },
-        {
-          name = "main_${var.environment}"
         }
-      ]
+        postgresdb2 = {
+        }
+      }
 
-      firewall_rules = [
-        {
-          name             = "rule1"
+      firewall_rules = {
+        rule1 = {
           start_ip_address = "111.222.333.444"
           end_ip_address   = "111.222.333.444"
-        },
-        {
-          name             = "AllowAzureServices"
+        }
+        AllowAzureServices = {
           start_ip_address = "0.0.0.0"
           end_ip_address   = "0.0.0.0"
         }
-      ]
+      }
 
       enabled = {
         ad_auth = true

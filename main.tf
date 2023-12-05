@@ -110,16 +110,16 @@ data "azuread_service_principal" "current" {
 }
 
 resource "azurerm_postgresql_flexible_server_database" "database" {
-  for_each = try({ for database in var.postgresql.databases : database.name => database }, {})
+  for_each = try({ for database in local.postgresql.databases : database.db_key => database }, {})
 
-  name      = each.key
+  name      = each.value.name
   server_id = azurerm_postgresql_flexible_server.postgresql.id
   charset   = try(each.value.charset, null)
   collation = try(each.value.collation, null)
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "postgresql" {
-  for_each = try({ for rule in var.postgresql.firewall_rules : rule.name => rule }, {})
+  for_each = try({ for key_rule, rule in var.postgresql.firewall_rules : key_rule => rule }, {})
 
   name             = each.key
   server_id        = azurerm_postgresql_flexible_server.postgresql.id
