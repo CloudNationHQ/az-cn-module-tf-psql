@@ -1,15 +1,13 @@
-provider "azurerm" {
-  features {}
-}
-
 module "naming" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-naming"
+  source  = "cloudnationhq/naming/azure"
+  version = "~> 0.1"
 
   suffix = ["demo", "dev"]
 }
 
 module "rg" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-rg"
+  source  = "cloudnationhq/rg/azure"
+  version = "~> 0.1"
 
   groups = {
     demo = {
@@ -20,20 +18,23 @@ module "rg" {
 }
 
 module "postgresql" {
-  source = "github.com/cloudnationhq/az-cn-module-tf-psql"
-  
-  postgresql  = {
-    name            = module.naming.postgresql.name_unique
-    location        = module.rg.groups.demo.location
-    resource_group  = module.rg.groups.demo.name
+  source  = "cloudnationhq/psql/azure"
+  version = "~> 0.1"
 
-    create_mode     = "Default"
-    sku_name        = "GP_Standard_D2s_v3"
-    server_version  = 15
+  postgresql = {
+    name           = module.naming.postgresql_server.name_unique
+    location       = module.rg.groups.demo.location
+    resource_group = module.rg.groups.demo.name
+
+    create_mode    = "Default"
+    sku_name       = "GP_Standard_D4ads_v5"
+    server_version = 15
+
+    zone = 1
 
     high_availability = {
-        mode                       = ZoneRedundant
-        standby_availability_zone  = 2
+      mode                      = "ZoneRedundant"
+      standby_availability_zone = 3
     }
   }
 }
