@@ -1,5 +1,5 @@
 module "naming" {
-  source  = "cloudnationhq/rg/azure"
+  source  = "cloudnationhq/naming/azure"
   version = "~> 0.1"
 
   suffix = ["demo", "dev"]
@@ -34,6 +34,7 @@ module "kv" {
           length      = 16
           special     = false
           min_special = 0
+          min_upper   = 2
         }
       }
     }
@@ -45,7 +46,7 @@ module "postgresql" {
   version = "~> 0.1"
 
   postgresql = {
-    name           = module.naming.postgresql.name_unique
+    name           = module.naming.postgresql_server.name_unique
     location       = module.rg.groups.demo.location
     resource_group = module.rg.groups.demo.name
 
@@ -53,7 +54,7 @@ module "postgresql" {
     sku_name       = "GP_Standard_D2s_v3"
     server_version = 15
 
-    admin_password = module.kv.kv_secrets.psql-admin-password.value
+    admin_password = module.kv.secrets.psql-admin-password.value
     key_vault_id   = module.kv.vault.id
 
     enabled = {
@@ -64,6 +65,7 @@ module "postgresql" {
     ad_admin = { ## This is the service principal that will be set as AD admin on the PostgreSQL server, if not defined the Service Principal of the Terraform run will be used
       object_id      = "XXXXXXXX-YYYY-ZZZZ-AAAA-1234567890"
       principal_name = "service-principal"
+      principal_type = "User"
     }
   }
 }
