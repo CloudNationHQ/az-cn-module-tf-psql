@@ -18,8 +18,8 @@ module "rg" {
 }
 
 module "postgresql" {
-  source = "github.com/CloudNationHQ/az-cn-module-tf-psql"
-  # version = "~> 0.1"
+  source  = "cloudnationhq/psql/azure"
+  version = "~> 0.1"
 
   postgresql = {
     name           = module.naming.postgresql_server.name
