@@ -35,11 +35,11 @@ module "network" {
 
     subnets = {
       postgresql = {
-        cidr = ["10.18.1.0/27"]
+        cidr = ["10.18.0.0/24"]
         delegations = {
           psql-delegation = {
             name    = "Microsoft.DBforPostgreSQL/flexibleServers"
-            actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+            actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
           }
         }
       }
@@ -52,7 +52,7 @@ module "postgresql" {
   version = "~> 0.1"
 
   postgresql = {
-    name           = module.naming.postgresql.name_unique
+    name           = module.naming.postgresql_server.name_unique
     location       = module.rg.groups.demo.location
     resource_group = module.rg.groups.demo.name
 
@@ -68,7 +68,7 @@ module "postgresql" {
 }
 
 module "private_dns" {
-  source  = "cloudnationhq/sa/azure//modules/private-dns"
+  source  = "cloudnationhq/psql/azure//modules/private-dns"
   version = "~> 0.1"
 
   providers = {

@@ -12,3 +12,9 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
+provider "azurerm" {
+  alias           = "connectivity"
+  subscription_id = "8dfd879b-0896-4aa4-b838-xxxxxxxxxxxx"
+  features {}
+}
