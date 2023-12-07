@@ -22,7 +22,7 @@ module "postgresql" {
   version = "~> 0.1"
 
   postgresql = {
-    name           = module.naming.postgresql.name_unique
+    name           = module.naming.postgresql_server.name_unique
     location       = module.rg.groups.demo.location
     resource_group = module.rg.groups.demo.name
 
