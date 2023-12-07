@@ -1,7 +1,3 @@
-provider "azurerm" {
-  features {}
-}
-
 module "naming" {
   source  = "cloudnationhq/naming/azure"
   version = "~> 0.1"
@@ -33,7 +29,7 @@ module "kv" {
     resourcegroup = module.rg.groups.demo.name
 
     keys = {
-      pgsql = {
+      psql = {
         key_type = "RSA"
         key_size = 2048
 
@@ -65,12 +61,12 @@ module "kv_backup" {
   naming = local.naming
 
   vault = {
-    name          = module.naming.key_vault.name_unique
+    name          = "${module.naming.key_vault.name_unique}-backup"
     location      = module.rg.groups.demo.location
     resourcegroup = module.rg.groups.demo.name
 
     keys = {
-      pgsql = {
+      psql = {
         key_type = "RSA"
         key_size = 2048
 
@@ -99,8 +95,10 @@ module "postgresql" {
   source  = "cloudnationhq/psql/azure"
   version = "~> 0.1"
 
+  naming = local.naming
+
   postgresql = {
-    name           = module.naming.postgresql.name_unique
+    name           = module.naming.postgresql_server.name_unique
     location       = module.rg.groups.demo.location
     resource_group = module.rg.groups.demo.name
 
@@ -110,18 +108,22 @@ module "postgresql" {
 
 
     cmk = {
-      key_vault_key_id                     = module.kv.kv_keys.psql.id
-      geo_backup_key_vault_key_id          = module.kv_backup.kv_keys.psql.id
-      geo_backup_user_assigned_identity_id = data.azurerm_user_assigned_identity.backup_user.id
+      key_vault_key_id                     = module.kv.keys.psql.id
+      geo_backup_key_vault_key_id          = module.kv_backup.keys.psql.id
+      geo_backup_user_assigned_identity_id = azurerm_user_assigned_identity.backup_user.id
     }
 
     identity = {
       user_assigned_identity = true
+      other_identity_ids     = [azurerm_user_assigned_identity.backup_user.id]
     }
   }
 }
 
-data "azurerm_user_assigned_identity" "backup_user" {
-  name                = "name-uai"
-  resource_group_name = "rg-test"
+
+resource "azurerm_user_assigned_identity" "backup_user" {
+
+  name                = module.naming.user_assigned_identity.name
+  resource_group_name = module.rg.groups.demo.name
+  location            = module.rg.groups.demo.location
 }
