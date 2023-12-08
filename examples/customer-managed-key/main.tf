@@ -62,7 +62,7 @@ module "kv_backup" {
 
   vault = {
     name          = "${module.naming.key_vault.name_unique}-backup"
-    location      = module.rg.groups.demo.location
+    location      = "northeurope"
     resourcegroup = module.rg.groups.demo.name
 
     keys = {
@@ -106,24 +106,19 @@ module "postgresql" {
     sku_name       = "GP_Standard_D2s_v3"
     server_version = 14
 
+    geo_redundant_backup_enabled = true
+
+    key_vault_id        = module.kv.vault.id
+    key_vault_backup_id = module.kv_backup.vault.id
 
     cmk = {
-      key_vault_key_id                     = module.kv.keys.psql.id
-      geo_backup_key_vault_key_id          = module.kv_backup.keys.psql.id
-      geo_backup_user_assigned_identity_id = azurerm_user_assigned_identity.backup_user.id
+      key_vault_key_id        = module.kv.keys.psql.id
+      key_vault_backup_key_id = module.kv_backup.keys.psql.id
     }
 
     identity = {
-      user_assigned_identity = true
-      other_identity_ids     = [azurerm_user_assigned_identity.backup_user.id]
+      user_assigned_identity        = true
+      user_assigned_backup_identity = true
     }
   }
-}
-
-
-resource "azurerm_user_assigned_identity" "backup_user" {
-
-  name                = module.naming.user_assigned_identity.name
-  resource_group_name = module.rg.groups.demo.name
-  location            = module.rg.groups.demo.location
 }
