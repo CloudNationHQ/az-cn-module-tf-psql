@@ -1,5 +1,6 @@
 locals {
   naming = {
+    key_vault_key          = module.naming.key_vault_key.name
     key_vault_secret       = module.naming.key_vault_secret.name
     subnet                 = module.naming.subnet.name
     network_security_group = module.naming.network_security_group.name
