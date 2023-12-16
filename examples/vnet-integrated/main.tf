@@ -17,25 +17,15 @@ module "rg" {
   }
 }
 
-module "kv" {
-  source  = "cloudnationhq/kv/azure"
-  version = "~> 0.2"
-
-  for_each = {
-    for key, kv in local.key_vaults : key => kv
-  }
-
-  naming = local.naming
-
-  vault = each.value
-
-}
-
 module "network" {
   source  = "cloudnationhq/vnet/azure"
   version = "~> 0.1"
 
-  naming = local.naming
+  naming = {
+    subnet                 = module.naming.subnet.name
+    network_security_group = module.naming.network_security_group.name
+    route_table            = module.naming.route_table.name
+  }
 
   vnet = {
     name          = module.naming.virtual_network.name
@@ -44,7 +34,7 @@ module "network" {
     cidr          = ["10.18.0.0/16"]
 
     subnets = {
-      psql = {
+      postgresql = {
         cidr = ["10.18.0.0/24"]
         delegations = {
           psql-delegation = {
@@ -61,29 +51,20 @@ module "postgresql" {
   source  = "cloudnationhq/psql/azure"
   version = "~> 0.1"
 
-  naming = local.naming
+  postgresql = {
+    name           = module.naming.postgresql_server.name_unique
+    location       = module.rg.groups.demo.location
+    resource_group = module.rg.groups.demo.name
 
-  for_each = {
-    for key, psql in local.postgresql_servers : key => psql
+    create_mode    = "Default"
+    sku_name       = "GP_Standard_D2s_v3"
+    server_version = 15
+
+    network = {
+      delegated_subnet_id = module.network.subnets.postgresql.id
+      private_dns_zone_id = module.private_dns.zone.id
+    }
   }
-  postgresql = each.value
-
-  depends_on = [module.network]
-}
-
-
-module "postgresql_replicas" {
-  source  = "cloudnationhq/psql/azure"
-  version = "~> 0.1"
-
-  naming = local.naming
-
-  for_each = {
-    for key, psql in local.postgresql_replicas : key => psql
-  }
-  postgresql = each.value
-
-  depends_on = [module.postgresql]
 }
 
 module "private_dns" {

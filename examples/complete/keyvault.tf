@@ -1,12 +1,12 @@
-locals = {
-  key_vaults = [
-    {
-      name          = "${module.naming.key_vault.name}-main"
+locals {
+  key_vaults = {
+    main = {
+      name          = "${module.naming.key_vault.name_unique}-main"
       location      = module.rg.groups.demo.location
       resourcegroup = module.rg.groups.demo.name
 
       keys = {
-        pgsql = {
+        psql = {
           key_type = "RSA"
           key_size = 2048
 
@@ -31,21 +31,22 @@ locals = {
 
       secrets = {
         random_string = {
-          "${module.naming.key_vault_secret.name}-admin-password" = {
+          psql-admin-password = {
             length      = 16
             special     = false
             min_special = 0
+            min_upper   = 2
           }
         }
       }
-    },
-    {
-      name          = "${module.naming.key_vault.name}-backup"
-      location      = module.rg.groups.demo.location
+    }
+    backup = {
+      name          = "${module.naming.key_vault.name_unique}-backup"
+      location      = "westus"
       resourcegroup = module.rg.groups.demo.name
 
       keys = {
-        pgsql = {
+        psql = {
           key_type = "RSA"
           key_size = 2048
 
@@ -68,5 +69,5 @@ locals = {
         }
       }
     }
-  ]
+  }
 }
