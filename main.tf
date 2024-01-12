@@ -127,10 +127,12 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "po
   tenant_id           = data.azurerm_client_config.current.tenant_id
   object_id           = try(var.postgresql.ad_admin.object_id, data.azurerm_client_config.current.object_id)
   principal_type      = try(var.postgresql.ad_admin.principal_type, "ServicePrincipal")
-  principal_name      = try(var.postgresql.ad_admin.principal_name, data.azuread_service_principal.current.display_name)
+  principal_name      = try(var.postgresql.ad_admin.principal_name, data.azuread_service_principal.current["id"].display_name)
 }
 
 data "azuread_service_principal" "current" {
+  for_each = try(var.postgresql.ad_admin.principal_name, null) == null ? { "id" = {} } : {}
+
   object_id = data.azurerm_client_config.current.object_id
 }
 
